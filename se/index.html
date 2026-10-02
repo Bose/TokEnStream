@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TokEnStream Listening Panel — libri1mix</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 2rem auto;
+      max-width: 800px;
+      padding: 0 1rem;
+      line-height: 1.4;
+    }
+    h1 { margin-bottom: 0.25rem; }
+    .dataset { color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+    section { margin-bottom: 2.5rem; }
+    h2 { border-bottom: 2px solid currentColor; padding-bottom: 0.25rem; }
+    table.descriptions {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+    table.descriptions td, table.descriptions th {
+      padding: 0.4rem 0.6rem;
+      text-align: left;
+      border-bottom: 1px solid #ccc4;
+      white-space: pre-wrap;
+      vertical-align: top;
+    }
+    table.descriptions td:first-child, table.descriptions th:first-child {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .buttons button {
+      font: inherit;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #8886;
+      border-radius: 6px;
+      background: Canvas;
+      color: inherit;
+      cursor: pointer;
+    }
+    .buttons button:hover { background: #8881; }
+    .buttons button.active {
+      background: #f80;
+      color: #000;
+      border-color: #f80;
+    }
+    audio { width: 100%; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>TokEnStream Listening Panel</h1>
+  <div class="dataset">libri1mix</div>
+
+  
+
+  <section>
+    <h2>Clip</h2>
+    <div class="buttons" id="stem-buttons"></div>
+    <h2>Run</h2>
+    <div class="buttons" id="run-buttons"></div>
+    <audio id="player" controls loop></audio>
+  </section>
+
+  <script>
+    const STEMS = ["2961-960-0014_2830-3980-0010", "4446-2273-0023_6930-81414-0020", "4970-29093-0018_1221-135766-0002", "4970-29095-0002_8463-294825-0005", "5142-33396-0014_4446-2275-0040", "61-70968-0049_7021-79740-0014", "672-122797-0060_8455-210777-0038", "7127-75947-0035_1580-141084-0021", "7729-102255-0043_1284-1180-0003", "8230-279154-0036_5142-33396-0034"];
+    const LABELS = ["Noisy input", "EnCodec RT, noisy", "EnCodec RT, clean (K=8)", "EnCodec RT, clean (full)", "Clean reference", "Delay, sum", "Delay, concat", "Coarse-to-fine, sum", "Coarse-to-fine, concat", "RQ-Conformer", "Continuous conformer", "Continuous transformer", "Continuous transformer, DAC", "Continuous transformer, Mimi", "Continuous transformer, STFT"];
+    const AUDIO = {"2961-960-0014_2830-3980-0010": {"Noisy input": "index_audio/0/2961-960-0014_2830-3980-0010.wav", "EnCodec RT, noisy": "index_audio/1/2961-960-0014_2830-3980-0010.wav", "EnCodec RT, clean (K=8)": "index_audio/2/2961-960-0014_2830-3980-0010.wav", "EnCodec RT, clean (full)": "index_audio/3/2961-960-0014_2830-3980-0010.wav", "Clean reference": "index_audio/4/2961-960-0014_2830-3980-0010.wav", "Delay, sum": "index_audio/5/2961-960-0014_2830-3980-0010.wav", "Delay, concat": "index_audio/6/2961-960-0014_2830-3980-0010.wav", "Coarse-to-fine, sum": "index_audio/7/2961-960-0014_2830-3980-0010.wav", "Coarse-to-fine, concat": "index_audio/8/2961-960-0014_2830-3980-0010.wav", "RQ-Conformer": "index_audio/9/2961-960-0014_2830-3980-0010.wav", "Continuous conformer": "index_audio/10/2961-960-0014_2830-3980-0010.wav", "Continuous transformer": "index_audio/11/2961-960-0014_2830-3980-0010.wav", "Continuous transformer, DAC": "index_audio/12/2961-960-0014_2830-3980-0010.wav", "Continuous transformer, Mimi": "index_audio/13/2961-960-0014_2830-3980-0010.wav", "Continuous transformer, STFT": "index_audio/14/2961-960-0014_2830-3980-0010.wav"}, "4446-2273-0023_6930-81414-0020": {"Noisy input": "index_audio/0/4446-2273-0023_6930-81414-0020.wav", "EnCodec RT, noisy": "index_audio/1/4446-2273-0023_6930-81414-0020.wav", "EnCodec RT, clean (K=8)": "index_audio/2/4446-2273-0023_6930-81414-0020.wav", "EnCodec RT, clean (full)": "index_audio/3/4446-2273-0023_6930-81414-0020.wav", "Clean reference": "index_audio/4/4446-2273-0023_6930-81414-0020.wav", "Delay, sum": "index_audio/5/4446-2273-0023_6930-81414-0020.wav", "Delay, concat": "index_audio/6/4446-2273-0023_6930-81414-0020.wav", "Coarse-to-fine, sum": "index_audio/7/4446-2273-0023_6930-81414-0020.wav", "Coarse-to-fine, concat": "index_audio/8/4446-2273-0023_6930-81414-0020.wav", "RQ-Conformer": "index_audio/9/4446-2273-0023_6930-81414-0020.wav", "Continuous conformer": "index_audio/10/4446-2273-0023_6930-81414-0020.wav", "Continuous transformer": "index_audio/11/4446-2273-0023_6930-81414-0020.wav", "Continuous transformer, DAC": "index_audio/12/4446-2273-0023_6930-81414-0020.wav", "Continuous transformer, Mimi": "index_audio/13/4446-2273-0023_6930-81414-0020.wav", "Continuous transformer, STFT": "index_audio/14/4446-2273-0023_6930-81414-0020.wav"}, "4970-29093-0018_1221-135766-0002": {"Noisy input": "index_audio/0/4970-29093-0018_1221-135766-0002.wav", "EnCodec RT, noisy": "index_audio/1/4970-29093-0018_1221-135766-0002.wav", "EnCodec RT, clean (K=8)": "index_audio/2/4970-29093-0018_1221-135766-0002.wav", "EnCodec RT, clean (full)": "index_audio/3/4970-29093-0018_1221-135766-0002.wav", "Clean reference": "index_audio/4/4970-29093-0018_1221-135766-0002.wav", "Delay, sum": "index_audio/5/4970-29093-0018_1221-135766-0002.wav", "Delay, concat": "index_audio/6/4970-29093-0018_1221-135766-0002.wav", "Coarse-to-fine, sum": "index_audio/7/4970-29093-0018_1221-135766-0002.wav", "Coarse-to-fine, concat": "index_audio/8/4970-29093-0018_1221-135766-0002.wav", "RQ-Conformer": "index_audio/9/4970-29093-0018_1221-135766-0002.wav", "Continuous conformer": "index_audio/10/4970-29093-0018_1221-135766-0002.wav", "Continuous transformer": "index_audio/11/4970-29093-0018_1221-135766-0002.wav", "Continuous transformer, DAC": "index_audio/12/4970-29093-0018_1221-135766-0002.wav", "Continuous transformer, Mimi": "index_audio/13/4970-29093-0018_1221-135766-0002.wav", "Continuous transformer, STFT": "index_audio/14/4970-29093-0018_1221-135766-0002.wav"}, "4970-29095-0002_8463-294825-0005": {"Noisy input": "index_audio/0/4970-29095-0002_8463-294825-0005.wav", "EnCodec RT, noisy": "index_audio/1/4970-29095-0002_8463-294825-0005.wav", "EnCodec RT, clean (K=8)": "index_audio/2/4970-29095-0002_8463-294825-0005.wav", "EnCodec RT, clean (full)": "index_audio/3/4970-29095-0002_8463-294825-0005.wav", "Clean reference": "index_audio/4/4970-29095-0002_8463-294825-0005.wav", "Delay, sum": "index_audio/5/4970-29095-0002_8463-294825-0005.wav", "Delay, concat": "index_audio/6/4970-29095-0002_8463-294825-0005.wav", "Coarse-to-fine, sum": "index_audio/7/4970-29095-0002_8463-294825-0005.wav", "Coarse-to-fine, concat": "index_audio/8/4970-29095-0002_8463-294825-0005.wav", "RQ-Conformer": "index_audio/9/4970-29095-0002_8463-294825-0005.wav", "Continuous conformer": "index_audio/10/4970-29095-0002_8463-294825-0005.wav", "Continuous transformer": "index_audio/11/4970-29095-0002_8463-294825-0005.wav", "Continuous transformer, DAC": "index_audio/12/4970-29095-0002_8463-294825-0005.wav", "Continuous transformer, Mimi": "index_audio/13/4970-29095-0002_8463-294825-0005.wav", "Continuous transformer, STFT": "index_audio/14/4970-29095-0002_8463-294825-0005.wav"}, "5142-33396-0014_4446-2275-0040": {"Noisy input": "index_audio/0/5142-33396-0014_4446-2275-0040.wav", "EnCodec RT, noisy": "index_audio/1/5142-33396-0014_4446-2275-0040.wav", "EnCodec RT, clean (K=8)": "index_audio/2/5142-33396-0014_4446-2275-0040.wav", "EnCodec RT, clean (full)": "index_audio/3/5142-33396-0014_4446-2275-0040.wav", "Clean reference": "index_audio/4/5142-33396-0014_4446-2275-0040.wav", "Delay, sum": "index_audio/5/5142-33396-0014_4446-2275-0040.wav", "Delay, concat": "index_audio/6/5142-33396-0014_4446-2275-0040.wav", "Coarse-to-fine, sum": "index_audio/7/5142-33396-0014_4446-2275-0040.wav", "Coarse-to-fine, concat": "index_audio/8/5142-33396-0014_4446-2275-0040.wav", "RQ-Conformer": "index_audio/9/5142-33396-0014_4446-2275-0040.wav", "Continuous conformer": "index_audio/10/5142-33396-0014_4446-2275-0040.wav", "Continuous transformer": "index_audio/11/5142-33396-0014_4446-2275-0040.wav", "Continuous transformer, DAC": "index_audio/12/5142-33396-0014_4446-2275-0040.wav", "Continuous transformer, Mimi": "index_audio/13/5142-33396-0014_4446-2275-0040.wav", "Continuous transformer, STFT": "index_audio/14/5142-33396-0014_4446-2275-0040.wav"}, "61-70968-0049_7021-79740-0014": {"Noisy input": "index_audio/0/61-70968-0049_7021-79740-0014.wav", "EnCodec RT, noisy": "index_audio/1/61-70968-0049_7021-79740-0014.wav", "EnCodec RT, clean (K=8)": "index_audio/2/61-70968-0049_7021-79740-0014.wav", "EnCodec RT, clean (full)": "index_audio/3/61-70968-0049_7021-79740-0014.wav", "Clean reference": "index_audio/4/61-70968-0049_7021-79740-0014.wav", "Delay, sum": "index_audio/5/61-70968-0049_7021-79740-0014.wav", "Delay, concat": "index_audio/6/61-70968-0049_7021-79740-0014.wav", "Coarse-to-fine, sum": "index_audio/7/61-70968-0049_7021-79740-0014.wav", "Coarse-to-fine, concat": "index_audio/8/61-70968-0049_7021-79740-0014.wav", "RQ-Conformer": "index_audio/9/61-70968-0049_7021-79740-0014.wav", "Continuous conformer": "index_audio/10/61-70968-0049_7021-79740-0014.wav", "Continuous transformer": "index_audio/11/61-70968-0049_7021-79740-0014.wav", "Continuous transformer, DAC": "index_audio/12/61-70968-0049_7021-79740-0014.wav", "Continuous transformer, Mimi": "index_audio/13/61-70968-0049_7021-79740-0014.wav", "Continuous transformer, STFT": "index_audio/14/61-70968-0049_7021-79740-0014.wav"}, "672-122797-0060_8455-210777-0038": {"Noisy input": "index_audio/0/672-122797-0060_8455-210777-0038.wav", "EnCodec RT, noisy": "index_audio/1/672-122797-0060_8455-210777-0038.wav", "EnCodec RT, clean (K=8)": "index_audio/2/672-122797-0060_8455-210777-0038.wav", "EnCodec RT, clean (full)": "index_audio/3/672-122797-0060_8455-210777-0038.wav", "Clean reference": "index_audio/4/672-122797-0060_8455-210777-0038.wav", "Delay, sum": "index_audio/5/672-122797-0060_8455-210777-0038.wav", "Delay, concat": "index_audio/6/672-122797-0060_8455-210777-0038.wav", "Coarse-to-fine, sum": "index_audio/7/672-122797-0060_8455-210777-0038.wav", "Coarse-to-fine, concat": "index_audio/8/672-122797-0060_8455-210777-0038.wav", "RQ-Conformer": "index_audio/9/672-122797-0060_8455-210777-0038.wav", "Continuous conformer": "index_audio/10/672-122797-0060_8455-210777-0038.wav", "Continuous transformer": "index_audio/11/672-122797-0060_8455-210777-0038.wav", "Continuous transformer, DAC": "index_audio/12/672-122797-0060_8455-210777-0038.wav", "Continuous transformer, Mimi": "index_audio/13/672-122797-0060_8455-210777-0038.wav", "Continuous transformer, STFT": "index_audio/14/672-122797-0060_8455-210777-0038.wav"}, "7127-75947-0035_1580-141084-0021": {"Noisy input": "index_audio/0/7127-75947-0035_1580-141084-0021.wav", "EnCodec RT, noisy": "index_audio/1/7127-75947-0035_1580-141084-0021.wav", "EnCodec RT, clean (K=8)": "index_audio/2/7127-75947-0035_1580-141084-0021.wav", "EnCodec RT, clean (full)": "index_audio/3/7127-75947-0035_1580-141084-0021.wav", "Clean reference": "index_audio/4/7127-75947-0035_1580-141084-0021.wav", "Delay, sum": "index_audio/5/7127-75947-0035_1580-141084-0021.wav", "Delay, concat": "index_audio/6/7127-75947-0035_1580-141084-0021.wav", "Coarse-to-fine, sum": "index_audio/7/7127-75947-0035_1580-141084-0021.wav", "Coarse-to-fine, concat": "index_audio/8/7127-75947-0035_1580-141084-0021.wav", "RQ-Conformer": "index_audio/9/7127-75947-0035_1580-141084-0021.wav", "Continuous conformer": "index_audio/10/7127-75947-0035_1580-141084-0021.wav", "Continuous transformer": "index_audio/11/7127-75947-0035_1580-141084-0021.wav", "Continuous transformer, DAC": "index_audio/12/7127-75947-0035_1580-141084-0021.wav", "Continuous transformer, Mimi": "index_audio/13/7127-75947-0035_1580-141084-0021.wav", "Continuous transformer, STFT": "index_audio/14/7127-75947-0035_1580-141084-0021.wav"}, "7729-102255-0043_1284-1180-0003": {"Noisy input": "index_audio/0/7729-102255-0043_1284-1180-0003.wav", "EnCodec RT, noisy": "index_audio/1/7729-102255-0043_1284-1180-0003.wav", "EnCodec RT, clean (K=8)": "index_audio/2/7729-102255-0043_1284-1180-0003.wav", "EnCodec RT, clean (full)": "index_audio/3/7729-102255-0043_1284-1180-0003.wav", "Clean reference": "index_audio/4/7729-102255-0043_1284-1180-0003.wav", "Delay, sum": "index_audio/5/7729-102255-0043_1284-1180-0003.wav", "Delay, concat": "index_audio/6/7729-102255-0043_1284-1180-0003.wav", "Coarse-to-fine, sum": "index_audio/7/7729-102255-0043_1284-1180-0003.wav", "Coarse-to-fine, concat": "index_audio/8/7729-102255-0043_1284-1180-0003.wav", "RQ-Conformer": "index_audio/9/7729-102255-0043_1284-1180-0003.wav", "Continuous conformer": "index_audio/10/7729-102255-0043_1284-1180-0003.wav", "Continuous transformer": "index_audio/11/7729-102255-0043_1284-1180-0003.wav", "Continuous transformer, DAC": "index_audio/12/7729-102255-0043_1284-1180-0003.wav", "Continuous transformer, Mimi": "index_audio/13/7729-102255-0043_1284-1180-0003.wav", "Continuous transformer, STFT": "index_audio/14/7729-102255-0043_1284-1180-0003.wav"}, "8230-279154-0036_5142-33396-0034": {"Noisy input": "index_audio/0/8230-279154-0036_5142-33396-0034.wav", "EnCodec RT, noisy": "index_audio/1/8230-279154-0036_5142-33396-0034.wav", "EnCodec RT, clean (K=8)": "index_audio/2/8230-279154-0036_5142-33396-0034.wav", "EnCodec RT, clean (full)": "index_audio/3/8230-279154-0036_5142-33396-0034.wav", "Clean reference": "index_audio/4/8230-279154-0036_5142-33396-0034.wav", "Delay, sum": "index_audio/5/8230-279154-0036_5142-33396-0034.wav", "Delay, concat": "index_audio/6/8230-279154-0036_5142-33396-0034.wav", "Coarse-to-fine, sum": "index_audio/7/8230-279154-0036_5142-33396-0034.wav", "Coarse-to-fine, concat": "index_audio/8/8230-279154-0036_5142-33396-0034.wav", "RQ-Conformer": "index_audio/9/8230-279154-0036_5142-33396-0034.wav", "Continuous conformer": "index_audio/10/8230-279154-0036_5142-33396-0034.wav", "Continuous transformer": "index_audio/11/8230-279154-0036_5142-33396-0034.wav", "Continuous transformer, DAC": "index_audio/12/8230-279154-0036_5142-33396-0034.wav", "Continuous transformer, Mimi": "index_audio/13/8230-279154-0036_5142-33396-0034.wav", "Continuous transformer, STFT": "index_audio/14/8230-279154-0036_5142-33396-0034.wav"}};
+
+    const state = { stem: STEMS[0], label: LABELS[0] };
+    const player = document.getElementById('player');
+    const stemButtons = document.getElementById('stem-buttons');
+    const runButtons = document.getElementById('run-buttons');
+
+    function renderButtons(container, values, current, onSelect) {
+      container.innerHTML = '';
+      values.forEach(value => {
+        const button = document.createElement('button');
+        button.textContent = value;
+        button.className = value === current ? 'active' : '';
+        button.addEventListener('click', () => onSelect(value));
+        container.appendChild(button);
+      });
+    }
+
+    function loadClip(stem, label, resetTime) {
+      const wasPaused = player.paused;
+      const savedTime = player.currentTime;
+
+      player.src = AUDIO[stem][label];
+      player.load();
+
+      player.addEventListener('loadedmetadata', function once() {
+        player.removeEventListener('loadedmetadata', once);
+        if (!resetTime) {
+          player.currentTime = Math.min(savedTime, player.duration || savedTime);
+        }
+        if (resetTime || !wasPaused) {
+          player.play();
+        }
+      });
+    }
+
+    function selectStem(stem) {
+      if (stem === state.stem) return;
+      state.stem = stem;
+      renderButtons(stemButtons, STEMS, state.stem, selectStem);
+      loadClip(state.stem, state.label, true);
+    }
+
+    function selectRun(label) {
+      if (label === state.label) return;
+      state.label = label;
+      renderButtons(runButtons, LABELS, state.label, selectRun);
+      loadClip(state.stem, state.label, false);
+    }
+
+    renderButtons(stemButtons, STEMS, state.stem, selectStem);
+    renderButtons(runButtons, LABELS, state.label, selectRun);
+    loadClip(state.stem, state.label, true);
+  </script>
+</body>
+</html>

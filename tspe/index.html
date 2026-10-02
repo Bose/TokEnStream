@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TokEnStream Listening Panel — vctk-dns4-tspe</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 2rem auto;
+      max-width: 800px;
+      padding: 0 1rem;
+      line-height: 1.4;
+    }
+    h1 { margin-bottom: 0.25rem; }
+    .dataset { color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+    section { margin-bottom: 2.5rem; }
+    h2 { border-bottom: 2px solid currentColor; padding-bottom: 0.25rem; }
+    table.descriptions {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+    table.descriptions td, table.descriptions th {
+      padding: 0.4rem 0.6rem;
+      text-align: left;
+      border-bottom: 1px solid #ccc4;
+      white-space: pre-wrap;
+      vertical-align: top;
+    }
+    table.descriptions td:first-child, table.descriptions th:first-child {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .buttons button {
+      font: inherit;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #8886;
+      border-radius: 6px;
+      background: Canvas;
+      color: inherit;
+      cursor: pointer;
+    }
+    .buttons button:hover { background: #8881; }
+    .buttons button.active {
+      background: #f80;
+      color: #000;
+      border-color: #f80;
+    }
+    audio { width: 100%; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>TokEnStream Listening Panel</h1>
+  <div class="dataset">vctk-dns4-tspe</div>
+
+  
+
+  <section>
+    <h2>Clip</h2>
+    <div class="buttons" id="stem-buttons"></div>
+    <h2>Run</h2>
+    <div class="buttons" id="run-buttons"></div>
+    <audio id="player" controls loop></audio>
+  </section>
+
+  <script>
+    const STEMS = ["0001/000571", "0021/000564", "0031/000663", "0031/000723", "0036/000039", "0049/000818", "0078/000593", "0080/000764", "0108/000489", "0108/000756"];
+    const LABELS = ["Mixture", "RT, mixture", "RT, target", "Target reference", "Conformer, Mult.", "Conformer, FiLM", "Transformer, Mult.", "Transformer, FiLM"];
+    const AUDIO = {"0001/000571": {"Mixture": "index_audio/0/0001/000571.wav", "RT, mixture": "index_audio/1/0001/000571.wav", "RT, target": "index_audio/2/0001/000571.wav", "Target reference": "index_audio/3/0001/000571.wav", "Conformer, Mult.": "index_audio/4/0001/000571.wav", "Conformer, FiLM": "index_audio/5/0001/000571.wav", "Transformer, Mult.": "index_audio/6/0001/000571.wav", "Transformer, FiLM": "index_audio/7/0001/000571.wav"}, "0021/000564": {"Mixture": "index_audio/0/0021/000564.wav", "RT, mixture": "index_audio/1/0021/000564.wav", "RT, target": "index_audio/2/0021/000564.wav", "Target reference": "index_audio/3/0021/000564.wav", "Conformer, Mult.": "index_audio/4/0021/000564.wav", "Conformer, FiLM": "index_audio/5/0021/000564.wav", "Transformer, Mult.": "index_audio/6/0021/000564.wav", "Transformer, FiLM": "index_audio/7/0021/000564.wav"}, "0031/000663": {"Mixture": "index_audio/0/0031/000663.wav", "RT, mixture": "index_audio/1/0031/000663.wav", "RT, target": "index_audio/2/0031/000663.wav", "Target reference": "index_audio/3/0031/000663.wav", "Conformer, Mult.": "index_audio/4/0031/000663.wav", "Conformer, FiLM": "index_audio/5/0031/000663.wav", "Transformer, Mult.": "index_audio/6/0031/000663.wav", "Transformer, FiLM": "index_audio/7/0031/000663.wav"}, "0031/000723": {"Mixture": "index_audio/0/0031/000723.wav", "RT, mixture": "index_audio/1/0031/000723.wav", "RT, target": "index_audio/2/0031/000723.wav", "Target reference": "index_audio/3/0031/000723.wav", "Conformer, Mult.": "index_audio/4/0031/000723.wav", "Conformer, FiLM": "index_audio/5/0031/000723.wav", "Transformer, Mult.": "index_audio/6/0031/000723.wav", "Transformer, FiLM": "index_audio/7/0031/000723.wav"}, "0036/000039": {"Mixture": "index_audio/0/0036/000039.wav", "RT, mixture": "index_audio/1/0036/000039.wav", "RT, target": "index_audio/2/0036/000039.wav", "Target reference": "index_audio/3/0036/000039.wav", "Conformer, Mult.": "index_audio/4/0036/000039.wav", "Conformer, FiLM": "index_audio/5/0036/000039.wav", "Transformer, Mult.": "index_audio/6/0036/000039.wav", "Transformer, FiLM": "index_audio/7/0036/000039.wav"}, "0049/000818": {"Mixture": "index_audio/0/0049/000818.wav", "RT, mixture": "index_audio/1/0049/000818.wav", "RT, target": "index_audio/2/0049/000818.wav", "Target reference": "index_audio/3/0049/000818.wav", "Conformer, Mult.": "index_audio/4/0049/000818.wav", "Conformer, FiLM": "index_audio/5/0049/000818.wav", "Transformer, Mult.": "index_audio/6/0049/000818.wav", "Transformer, FiLM": "index_audio/7/0049/000818.wav"}, "0078/000593": {"Mixture": "index_audio/0/0078/000593.wav", "RT, mixture": "index_audio/1/0078/000593.wav", "RT, target": "index_audio/2/0078/000593.wav", "Target reference": "index_audio/3/0078/000593.wav", "Conformer, Mult.": "index_audio/4/0078/000593.wav", "Conformer, FiLM": "index_audio/5/0078/000593.wav", "Transformer, Mult.": "index_audio/6/0078/000593.wav", "Transformer, FiLM": "index_audio/7/0078/000593.wav"}, "0080/000764": {"Mixture": "index_audio/0/0080/000764.wav", "RT, mixture": "index_audio/1/0080/000764.wav", "RT, target": "index_audio/2/0080/000764.wav", "Target reference": "index_audio/3/0080/000764.wav", "Conformer, Mult.": "index_audio/4/0080/000764.wav", "Conformer, FiLM": "index_audio/5/0080/000764.wav", "Transformer, Mult.": "index_audio/6/0080/000764.wav", "Transformer, FiLM": "index_audio/7/0080/000764.wav"}, "0108/000489": {"Mixture": "index_audio/0/0108/000489.wav", "RT, mixture": "index_audio/1/0108/000489.wav", "RT, target": "index_audio/2/0108/000489.wav", "Target reference": "index_audio/3/0108/000489.wav", "Conformer, Mult.": "index_audio/4/0108/000489.wav", "Conformer, FiLM": "index_audio/5/0108/000489.wav", "Transformer, Mult.": "index_audio/6/0108/000489.wav", "Transformer, FiLM": "index_audio/7/0108/000489.wav"}, "0108/000756": {"Mixture": "index_audio/0/0108/000756.wav", "RT, mixture": "index_audio/1/0108/000756.wav", "RT, target": "index_audio/2/0108/000756.wav", "Target reference": "index_audio/3/0108/000756.wav", "Conformer, Mult.": "index_audio/4/0108/000756.wav", "Conformer, FiLM": "index_audio/5/0108/000756.wav", "Transformer, Mult.": "index_audio/6/0108/000756.wav", "Transformer, FiLM": "index_audio/7/0108/000756.wav"}};
+
+    const state = { stem: STEMS[0], label: LABELS[0] };
+    const player = document.getElementById('player');
+    const stemButtons = document.getElementById('stem-buttons');
+    const runButtons = document.getElementById('run-buttons');
+
+    function renderButtons(container, values, current, onSelect) {
+      container.innerHTML = '';
+      values.forEach(value => {
+        const button = document.createElement('button');
+        button.textContent = value;
+        button.className = value === current ? 'active' : '';
+        button.addEventListener('click', () => onSelect(value));
+        container.appendChild(button);
+      });
+    }
+
+    function loadClip(stem, label, resetTime) {
+      const wasPaused = player.paused;
+      const savedTime = player.currentTime;
+
+      player.src = AUDIO[stem][label];
+      player.load();
+
+      player.addEventListener('loadedmetadata', function once() {
+        player.removeEventListener('loadedmetadata', once);
+        if (!resetTime) {
+          player.currentTime = Math.min(savedTime, player.duration || savedTime);
+        }
+        if (resetTime || !wasPaused) {
+          player.play();
+        }
+      });
+    }
+
+    function selectStem(stem) {
+      if (stem === state.stem) return;
+      state.stem = stem;
+      renderButtons(stemButtons, STEMS, state.stem, selectStem);
+      loadClip(state.stem, state.label, true);
+    }
+
+    function selectRun(label) {
+      if (label === state.label) return;
+      state.label = label;
+      renderButtons(runButtons, LABELS, state.label, selectRun);
+      loadClip(state.stem, state.label, false);
+    }
+
+    renderButtons(stemButtons, STEMS, state.stem, selectStem);
+    renderButtons(runButtons, LABELS, state.label, selectRun);
+    loadClip(state.stem, state.label, true);
+  </script>
+</body>
+</html>
